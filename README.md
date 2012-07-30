@@ -1,6 +1,6 @@
 # SitemapChecker
 
-Checks sitemap urls for valid response
+Takes a url pointing to xml or xml.gz sitemap file and returns array of status messages for urls contained within.
 
 ## Installation
 
@@ -18,7 +18,8 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+SitemapChecker::Checker.new(url)
+
 
 ## Contributing
 
