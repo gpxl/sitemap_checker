@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-`SitemapChecker::Checker.new(url)`
+    SitemapChecker::Checker.new(url)
 
 
 ## Contributing
