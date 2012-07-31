@@ -1,6 +1,6 @@
 # SitemapChecker
 
-Takes a url pointing to xml or xml.gz sitemap file and returns array of status messages for urls contained within.
+Takes a url pointing to an xml or xml.gz sitemap or siteindex file and returns array of status messages for urls contained within.
 
 ## Installation
 

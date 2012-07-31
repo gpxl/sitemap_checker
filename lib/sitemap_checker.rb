@@ -7,35 +7,44 @@ module SitemapChecker
   class Checker
     attr_reader :status_list
 
-    def initialize(url,schema='http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd')
-      @schema = schema
+    def initialize(url,schema='')
       @url = url
-      @sitemap = get_xml_from_url
-      sitemap_is_valid?
-      @status_list = get_status_list
+      @status_list = Array.new
+      process_xml
     end
 
     private
 
-    def get_xml_from_url
+    def get_xml_from_url(url)
       begin
-        Nokogiri::XML(Zlib::GzipReader.new(open(@url)))
+        Nokogiri::XML(Zlib::GzipReader.new(open(url)))
       rescue
-        Nokogiri::XML(open(@url))
+        Nokogiri::XML(open(url))
       end
     end
 
-    def sitemap_is_valid?
-      xsd = Nokogiri::XML::Schema(open(@schema))
-      raise 'Invalid Schema' unless xsd.valid?(@sitemap)
-      true
+    def process_xml
+      mxsd = Nokogiri::XML::Schema(open('http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'))
+      ixsd = Nokogiri::XML::Schema(open('http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd'))
+      xml = get_xml_from_url(@url)
+      if mxsd.valid?(xml)
+        @status_list = get_status_list(urls(xml))
+      elsif ixsd.valid?(xml)
+        maps = urls(xml)
+        maps.each do |map|
+          xml = get_xml_from_url(map)
+          @status_list += get_status_list(urls(xml))
+        end
+      else raise 'Invalid Schema'
+        false
+      end
     end
 
-    def urls
-      @sitemap.xpath("//xmlns:loc")
+    def urls(xml)
+      xml.xpath("//xmlns:loc")
     end
 
-    def get_status_list
+    def get_status_list(urls)
       statuses = []
       urls.each do |url|
         begin
