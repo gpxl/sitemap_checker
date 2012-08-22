@@ -5,12 +5,21 @@ require 'zlib'
 
 module SitemapChecker
   class Checker
-    attr_reader :status_list
+    attr_reader :url_list
 
     def initialize(url,schema='')
       @url = url
+      @url_list = Array.new
       @status_list = Array.new
       process_xml
+    end
+
+    def self.get_status(url)
+      begin
+        status = [url.content,open(url).status[0]]
+      rescue OpenURI::HTTPError => e
+        status = [url.content,e.io.status[0]]
+      end
     end
 
     private
@@ -28,12 +37,12 @@ module SitemapChecker
       ixsd = Nokogiri::XML::Schema(open('http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd'))
       xml = get_xml_from_url(@url)
       if mxsd.valid?(xml)
-        @status_list = get_status_list(urls(xml))
+        @url_list = urls(xml)
       elsif ixsd.valid?(xml)
         maps = urls(xml)
         maps.each do |map|
           xml = get_xml_from_url(map)
-          @status_list += get_status_list(urls(xml))
+          @url_list = urls(xml)
         end
       else raise 'Invalid Schema'
         false

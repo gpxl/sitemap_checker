@@ -16,32 +16,35 @@ describe SitemapChecker do
     stub_request(:get, "http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xsd'), :headers => {})
   end
 
-  it "accepts xml and gzipped siteindexes" do
+  it "accepts xml siteindexes" do
     @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml')
+    @xml_sitemap.url_list.size.should eq(2)
+  end
+
+  it "accepts gzipped siteindexes" do
     @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml.gz')
-    @xml_sitemap.status_list.size.should eq(4)
-    @gz_sitemap.status_list.size.should eq(4)
+    @gz_sitemap.url_list.size.should eq(2)
+  end
+
+  it "accepts xml sitemaps" do
+    @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
+    @xml_sitemap.url_list.size.should eq(2)
   end
 
   it "accepts xml and gzipped sitemaps" do
     @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
     @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml.gz')
-    @xml_sitemap.status_list.size.should eq(2)
-    @gz_sitemap.status_list.size.should eq(2)
+    @xml_sitemap.url_list.size.should eq(2)
+    @gz_sitemap.url_list.size.should eq(2)
   end
 
   it "Errors if input doc does not match sitemap schema" do
     lambda {SitemapChecker::Checker.new('http://www.github.com')}.should raise_error(RuntimeError, 'Invalid Schema')
   end
 
-  it "returns list of urls with responses from sitemap" do
+  it "returns status if given a url" do
     @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    @sitemap.status_list.should eq([['http://www.github.com','200'], ['http://www.github.com/404','404']])
-  end
-
-  it "returns list of urls with responses from siteindex" do
-    @siteindex = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml')
-    @siteindex.status_list.should eq([['http://www.github.com','200'], ['http://www.github.com/404','404'], ['http://www.github.com','200'], ['http://www.github.com/404','404']])
+    SitemapChecker::Checker.get_status(@sitemap.url_list.first).should eq(['http://www.github.com','200'])
   end
 
 end

@@ -1,6 +1,6 @@
 # SitemapChecker
 
-Takes a url pointing to an xml or xml.gz sitemap or siteindex file and returns array of status messages for urls contained within.
+Takes a url pointing to an xml or xml.gz sitemap or siteindex file and returns array of urls contained within.
 
 ## Installation
 
@@ -18,8 +18,13 @@ Or install it yourself as:
 
 ## Usage
 
+Get list of urls from xml or xml.gz sitemap url
+    
     SitemapChecker::Checker.new(url)
 
+Get status of url
+
+    SitemapChecker::Checker.get_status(url)
 
 ## Contributing
 
