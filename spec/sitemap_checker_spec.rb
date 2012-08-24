@@ -44,7 +44,7 @@ describe SitemapChecker do
 
   it "returns status if given a url" do
     @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    SitemapChecker::Checker.get_status(@sitemap.url_list.first).should eq(['http://www.github.com','200'])
+    SitemapChecker::Checker.get_status_from_xml(@sitemap.url_list.first).should eq(['http://www.github.com','200'])
   end
 
 end

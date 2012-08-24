@@ -14,11 +14,15 @@ module SitemapChecker
       process_xml
     end
 
+    def self.get_status_from_xml(url)
+      get_status(url.content)
+    end
+
     def self.get_status(url)
       begin
-        status = [url.content,open(url).status[0]]
+        status = [url,open(url).status[0]]
       rescue OpenURI::HTTPError => e
-        status = [url.content,e.io.status[0]]
+        status = [url,e.io.status[0]]
       end
     end
 
