@@ -16,35 +16,40 @@ describe SitemapChecker do
     stub_request(:get, "http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xsd'), :headers => {})
   end
 
-  it "accepts xml siteindexes" do
+  it "Checker accepts xml siteindexes" do
     @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml')
-    @xml_sitemap.url_list.size.should eq(2)
+    @xml_sitemap.list.urls.size.should eq(2)
   end
 
-  it "accepts gzipped siteindexes" do
+  it "Checker accepts gzipped siteindexes" do
     @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml.gz')
-    @gz_sitemap.url_list.size.should eq(2)
+    @gz_sitemap.list.urls.size.should eq(2)
   end
 
-  it "accepts xml sitemaps" do
+  it "Checker accepts xml sitemaps" do
     @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    @xml_sitemap.url_list.size.should eq(2)
+    @xml_sitemap.list.urls.size.should eq(2)
   end
 
-  it "accepts xml and gzipped sitemaps" do
+  it "Checker accepts xml and gzipped sitemaps" do
     @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
     @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml.gz')
-    @xml_sitemap.url_list.size.should eq(2)
-    @gz_sitemap.url_list.size.should eq(2)
+    @xml_sitemap.list.urls.size.should eq(2)
+    @gz_sitemap.list.urls.size.should eq(2)
   end
 
-  it "Errors if input doc does not match sitemap schema" do
+  it "Checker Errors if input doc does not match sitemap schema" do
     lambda {SitemapChecker::Checker.new('http://www.github.com')}.should raise_error(RuntimeError, 'Invalid Schema')
+  end
+
+  it "Checker returns Path object if given a url" do
+    @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
+    SitemapChecker::Checker.get_status_from_xml(@sitemap.list.urls.first).class.should eq(SitemapChecker::Path)
   end
 
   it "returns status if given a url" do
     @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    SitemapChecker::Checker.get_status_from_xml(@sitemap.url_list.first).should eq(['http://www.github.com','200'])
+    SitemapChecker::Checker.get_status_from_xml(@sitemap.list.urls.first).status.should eq('200')
   end
 
 end
