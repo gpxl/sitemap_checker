@@ -18,13 +18,19 @@ Or install it yourself as:
 
 ## Usage
 
-Get list of urls from xml or xml.gz sitemap url
+Get list of urls(locs) from xml or xml.gz sitemap url.
     
-    SitemapChecker::Checker.new(url)
+    @sitemap = SitemapChecker::Sitemap.new(url)
+    @sitemap.locs.size
 
-Get status of url
+Get status of url from Sitemap
 
-    SitemapChecker::Checker.get_status(url)
+    @sitemap = SitemapChecker::Sitemap.new(url)
+    @sitemap.locs.first.status
+
+or directly as a Path
+
+    SitemapChecker::Path.new(url).status
 
 ## Contributing
 
