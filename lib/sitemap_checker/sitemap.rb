@@ -55,7 +55,7 @@ module SitemapChecker
     end
 
     def get_locs(xml)
-      xml.xpath("//xmlns:loc").map{|path| Path.new(path) }
+      xml.xpath("//xmlns:loc").map{|path| Path.new(path.content) }
     end
 
   end
