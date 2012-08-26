@@ -16,40 +16,39 @@ describe SitemapChecker do
     stub_request(:get, "http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xsd'), :headers => {})
   end
 
-  it "Checker accepts xml siteindexes" do
-    @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml')
-    @xml_sitemap.list.urls.size.should eq(2)
+  it "Sitemap accepts xml siteindexes" do
+    @list = SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml')
+    @list.locs.size.should eq(4)
   end
 
-  it "Checker accepts gzipped siteindexes" do
-    @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/siteindex.xml.gz')
-    @gz_sitemap.list.urls.size.should eq(2)
+  it "Sitemap accepts gzipped siteindexes" do
+    @list = SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml.gz')
+    @list.locs.size.should eq(4)
   end
 
-  it "Checker accepts xml sitemaps" do
-    @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    @xml_sitemap.list.urls.size.should eq(2)
+  it "Sitemap accepts xml sitemaps" do
+    @list = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
+    @list.locs.size.should eq(2)
   end
 
-  it "Checker accepts xml and gzipped sitemaps" do
-    @xml_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    @gz_sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml.gz')
-    @xml_sitemap.list.urls.size.should eq(2)
-    @gz_sitemap.list.urls.size.should eq(2)
+  it "Sitemap accepts xml and gzipped sitemaps" do
+    @xml_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
+    @gz_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml.gz')
+    @xml_sitemap.locs.size.should eq(2)
+    @gz_sitemap.locs.size.should eq(2)
   end
 
-  it "Checker Errors if input doc does not match sitemap schema" do
-    lambda {SitemapChecker::Checker.new('http://www.github.com')}.should raise_error(RuntimeError, 'Invalid Schema')
+  it "Sitemap errors if input doc does not match sitemap schema" do
+    lambda {SitemapChecker::Sitemap.new('http://www.github.com')}.should raise_error(RuntimeError, 'Invalid Schema')
   end
 
-  it "Checker returns Path object if given a url" do
-    @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    SitemapChecker::Checker.get_status_from_xml(@sitemap.list.urls.first).class.should eq(SitemapChecker::Path)
+  it "Sitemap locs are Path objects" do
+    @xml_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
+    @xml_sitemap.locs.first.class.should eq(SitemapChecker::Path)
   end
 
-  it "returns status if given a url" do
-    @sitemap = SitemapChecker::Checker.new('http://www.github.com/sitemap.xml')
-    SitemapChecker::Checker.get_status_from_xml(@sitemap.list.urls.first).status.should eq('200')
+  it "Path#status returns status code" do
+    SitemapChecker::Path.new('http://www.github.com').status.should eq('200')
   end
 
 end

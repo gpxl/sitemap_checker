@@ -5,7 +5,6 @@ require 'zlib'
 
 
 module SitemapChecker
-  autoload :Path, "sitemap_checker/path"
-  autoload :List, "sitemap_checker/list"
-  autoload :Checker, "sitemap_checker/checker"
+  autoload :Sitemap, "./lib/sitemap_checker/sitemap"
+  autoload :Path, "./lib/sitemap_checker/path"
 end
