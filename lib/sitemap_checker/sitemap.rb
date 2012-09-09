@@ -27,13 +27,7 @@ module SitemapChecker
     end
 
     def is_siteindex?(xml)
-      ixsd = Nokogiri::XML::Schema(open('http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd'))
-      ixsd.valid?(xml)
-    end
-
-    def is_sitemap?(xml)
-      mxsd = Nokogiri::XML::Schema(open('http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd'))
-      mxsd.valid?(xml)
+      xml.xpath('//xmlns:sitemap').size > 0
     end
 
     def process_siteindex(xml)
@@ -47,11 +41,7 @@ module SitemapChecker
     end
 
     def process_sitemap(xml)
-      if is_sitemap?(xml)
-        return get_locs(xml)
-      else raise 'Invalid Schema'
-        return false
-      end
+      return get_locs(xml)
     end
 
     def get_locs(xml)

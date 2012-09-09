@@ -12,8 +12,6 @@ describe SitemapChecker do
     stub_request(:any, "http://www.github.com/sitemap.xml.gz").to_return(:status => 200, :body => File.read(@dir + 'fixtures/sitemap.xml.gz'))
     stub_request(:any, "http://www.github.com/siteindex.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xml'))
     stub_request(:any, "http://www.github.com/siteindex.xml.gz").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xml.gz'))
-    stub_request(:get, "http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd").to_return(:status => 200, :body => File.read(@dir + 'fixtures/sitemap.xsd'), :headers => {})
-    stub_request(:get, "http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xsd'), :headers => {})
   end
 
   it "Sitemap accepts xml siteindexes" do
@@ -36,10 +34,6 @@ describe SitemapChecker do
     @gz_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml.gz')
     @xml_sitemap.locs.size.should eq(2)
     @gz_sitemap.locs.size.should eq(2)
-  end
-
-  it "Sitemap errors if input doc does not match sitemap schema" do
-    lambda {SitemapChecker::Sitemap.new('http://www.github.com')}.should raise_error(RuntimeError, 'Invalid Schema')
   end
 
   it "Sitemap locs are Path objects" do
