@@ -20,9 +20,9 @@ module SitemapChecker
 
     def get_xml_from_map(map)
       begin
-        Nokogiri::XML(Zlib::GzipReader.new(open(map)))
+        Nokogiri::XML(Zlib::GzipReader.new(open(map, {:allow_unsafe_redirects => true})))
       rescue
-        Nokogiri::XML(open(map))
+        Nokogiri::XML(open(map, {:allow_unsafe_redirects => true}))
       end
     end
 
