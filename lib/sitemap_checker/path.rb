@@ -13,7 +13,7 @@ module SitemapChecker
 
     def status
       begin
-        @status ||= open(@url, {:allow_unsafe_redirects => true}).status[0]
+        @status ||= open(@url, "Accept"=> 'text/html').status[0]
       rescue RuntimeError => e
         e
       rescue OpenURI::HTTPError => e
