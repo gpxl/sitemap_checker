@@ -13,7 +13,7 @@ module SitemapChecker
 
     def status
       begin
-        @status ||= open(@url, "Accept" => @url[/\.xml$/] ? 'application/xml' : 'text/html').status[0]
+        open(@url, "Accept" => @url[/\.xml$/] ? 'application/xml' : 'text/html').status[0]
       rescue RuntimeError => e
         e
       rescue OpenURI::HTTPError => e
