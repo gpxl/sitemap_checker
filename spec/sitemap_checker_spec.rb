@@ -12,37 +12,40 @@ describe SitemapChecker do
     stub_request(:any, "http://www.github.com/sitemap.xml.gz").to_return(:status => 200, :body => File.read(@dir + 'fixtures/sitemap.xml.gz'))
     stub_request(:any, "http://www.github.com/siteindex.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xml'))
     stub_request(:any, "http://www.github.com/siteindex.xml.gz").to_return(:status => 200, :body => File.read(@dir + 'fixtures/siteindex.xml.gz'))
+
+    stub_request(:any, "http://store.apple.com/apple-robots.txt").to_return(:status => 200, :body => File.read(@dir + 'fixtures/apple-robots.txt'))
+    stub_request(:any, "http://store.apple.com/apple-index.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/apple-index.xml'))
+    stub_request(:any, "http://store.apple.com/apple-sitemap.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/apple-sitemap.xml'))
+    stub_request(:any, "http://store.apple.com/apple-sitemap-new.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/apple-sitemap-new.xml'))
+  end
+
+  it "Sitemap gracefully handles 404s" do
+    SitemapChecker::Sitemap.new('http://www.github.com/404').errors.size.should eq(4)
   end
 
   it "Sitemap accepts xml siteindexes" do
-    @list = SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml')
-    @list.locs.size.should eq(4)
+    SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml').locs.size.should eq(4)
   end
 
   it "Sitemap accepts gzipped siteindexes" do
-    @list = SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml.gz')
-    @list.locs.size.should eq(4)
+    SitemapChecker::Sitemap.new('http://www.github.com/siteindex.xml.gz').locs.size.should eq(4)
   end
 
   it "Sitemap accepts xml sitemaps" do
-    @list = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
-    @list.locs.size.should eq(2)
+    SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml').locs.size.should eq(2)
   end
 
-  it "Sitemap accepts xml and gzipped sitemaps" do
-    @xml_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
-    @gz_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml.gz')
-    @xml_sitemap.locs.size.should eq(2)
-    @gz_sitemap.locs.size.should eq(2)
+  it "Sitemap accepts gzipped sitemaps" do
+    SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml.gz').locs.size.should eq(2)
   end
 
   it "Sitemap locs are Path objects" do
-    @xml_sitemap = SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml')
-    @xml_sitemap.locs.first.class.should eq(SitemapChecker::Path)
+    SitemapChecker::Sitemap.new('http://www.github.com/sitemap.xml').locs.first.class.should eq(SitemapChecker::Path)
   end
 
   it "Path#status returns status code" do
     SitemapChecker::Path.new('http://www.github.com').status.should eq('200')
+    SitemapChecker::Path.new('http://www.github.com/404').status.should eq('404')
   end
 
 end

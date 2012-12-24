@@ -1,0 +1,3 @@
+Sitemap: http://store.apple.com/index-new-sitemap.xml
+
+User-agent: *
