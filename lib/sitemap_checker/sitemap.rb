@@ -1,15 +1,21 @@
+require 'nokogiri'
+
 module SitemapChecker
   class Sitemap
     attr_accessor :locs, :map
 
     def initialize(map)
-      @map = map
-      @locs = process_map
+      @map = Uri.new(map)
+      if @map.io.status[0] == '200'
+        @locs = process_map(@map)
+      else
+        @locs = nil
+      end
     end
 
     private
 
-    def process_map
+    def process_map(map)
       xml = get_xml_from_map(@map)
       if is_siteindex?(xml)
         process_siteindex(xml)
@@ -19,10 +25,13 @@ module SitemapChecker
     end
 
     def get_xml_from_map(map)
-      begin
-        Nokogiri::XML(Zlib::GzipReader.new(open(map, {:allow_unsafe_redirects => true})))
-      rescue
-        Nokogiri::XML(open(map, {:allow_unsafe_redirects => true}))
+      case map.io.content_type
+      when 'application/octet-stream'
+        Nokogiri::XML(Zlib::GzipReader.new(map.io))
+      when 'application/xml'
+        Nokogiri::XML(map.io)
+      else
+        nil
       end
     end
 
@@ -34,7 +43,7 @@ module SitemapChecker
       @urls = []
       maps = get_locs(xml)
       maps.each do |map|
-        xml = get_xml_from_map(map.url)
+        xml = get_xml_from_map(Uri.new(map))
         @urls += process_sitemap(xml)
       end
       return @urls
@@ -45,7 +54,7 @@ module SitemapChecker
     end
 
     def get_locs(xml)
-      xml.xpath("//xmlns:loc").map{|path| Path.new(path.content) }
+      xml.xpath("//xmlns:loc").map{|path| path.content }
     end
 
   end

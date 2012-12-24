@@ -7,5 +7,5 @@ require "sitemap_checker/open_uri"
 
 module SitemapChecker
   autoload :Sitemap, "sitemap_checker/sitemap"
-  autoload :Path, "sitemap_checker/path"
+  autoload :Sitemap, "sitemap_checker/uri"
 end
