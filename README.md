@@ -28,10 +28,6 @@ Get status of url from Sitemap
     @sitemap = SitemapChecker::Sitemap.new(url)
     @sitemap.locs.first.status
 
-or directly as a Path
-
-    SitemapChecker::Path.new(url).status
-
 ## Contributing
 
 1. Fork it
