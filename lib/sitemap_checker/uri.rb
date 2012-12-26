@@ -3,7 +3,7 @@ require 'nokogiri'
 
 module SitemapChecker
   class Uri
-    attr_accessor :uri, :xml
+    attr_accessor :uri, :xml, :is_siteindex
 
     def initialize(uri)
       @uri = uri
@@ -21,6 +21,10 @@ module SitemapChecker
           nil
         end
       end
+    end
+
+    def is_siteindex
+      @xml.xpath('//xmlns:sitemap').size > 0
     end
 
     def open_io

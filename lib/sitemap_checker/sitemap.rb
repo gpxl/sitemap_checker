@@ -4,36 +4,35 @@ module SitemapChecker
 
     def initialize(uri)
       @uri = Uri.new(uri)
-      @locs = process_uri(@uri)
+      @locs = get_locs(@uri)
     end
 
     private
 
-    def process_uri(uri)
-      uri.xml.nil? ? nil : process_xml(uri.xml)
-    end
-
-    def process_xml(xml)
-      is_siteindex?(xml) ? process_siteindex(xml) : get_locs(xml)
+    def get_locs(uri)
+      case
+      when uri.xml.nil?
+        nil
+      when uri.is_siteindex
+        process_siteindex(uri.xml)
+      else
+        get_uris(uri.xml)
+      end
     end
 
     def process_siteindex(xml)
       @urls = []
-      get_locs(xml).each do |loc|
+      get_uris(xml).each do |loc|
         uri = Uri.new(loc)
-        locs = process_uri(uri)
+        locs = get_locs(uri)
         if !locs.nil?
-          @urls += get_locs(uri.xml)
+          @urls += get_uris(uri.xml)
         end
       end
       return @urls
     end
 
-    def is_siteindex?(xml)
-      xml.xpath('//xmlns:sitemap').size > 0
-    end
-
-    def get_locs(xml)
+    def get_uris(xml)
       xml.xpath("//xmlns:loc").map{|path| path.content }
     end
 
