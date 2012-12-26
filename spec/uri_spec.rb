@@ -6,17 +6,22 @@ WebMock.disable_net_connect!(:allow_localhost => true)
 describe 'SitemapChecker::Uri' do
 
   before(:each) do
-    stub_request(:any, "http://www.io.com/index.xml").to_return(:status => 200, :body => 'foo')
-    stub_request(:any, "http://www.io.com").to_return(:status => 200, :body => 'foo')
-    stub_request(:any, "http://www.io.com/404").to_return(:status => 404, :body => 'foo')
+    @dir  = Pathname.new(File.dirname(__FILE__))
+    stub_request(:any, "http://www.github.com/404").to_return(:status => 404)
+    stub_request(:any, "http://www.github.com/sitemap.xml").to_return(:status => 200, :body => File.read(@dir + 'fixtures/sitemap.xml'), headers: {'Content-type' => 'application/xml'})
+    stub_request(:any, "http://www.github.com/sitemap.xml.gz").to_return(:status => 200, :body => File.read(@dir + 'fixtures/sitemap.xml.gz'), headers: {'Content-type' => 'application/octet-stream'})
   end
 
-  it "contains an IO object" do
-    SitemapChecker::Uri.new('http://www.io.com').io.class.name.should eq('StringIO')
+  it "Accepts XML" do
+    SitemapChecker::Uri.new('http://www.github.com/sitemap.xml').xml.class.should eq(Nokogiri::XML::Document)
   end
 
-  it "handles 404's" do
-    SitemapChecker::Uri.new('http://www.io.com/404').io.class.name.should eq('StringIO')
+  it "Accepts Gzipped XML" do
+    SitemapChecker::Uri.new('http://www.github.com/sitemap.xml.gz').xml.class.should eq(Nokogiri::XML::Document)
+  end
+
+  it "does not contain IO object if not xml or gz" do
+    SitemapChecker::Uri.new('http://www.github.com/404').xml.class.should eq(NilClass)
   end
 
 end

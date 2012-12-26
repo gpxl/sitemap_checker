@@ -1,56 +1,36 @@
-require 'nokogiri'
-
 module SitemapChecker
   class Sitemap
-    attr_accessor :locs, :map
+    attr_accessor :locs, :uri
 
-    def initialize(map)
-      @map = Uri.new(map)
-      if @map.io.status[0] == '200'
-        @locs = process_map(@map)
-      else
-        @locs = nil
-      end
+    def initialize(uri)
+      @uri = Uri.new(uri)
+      @locs = process_uri(@uri)
     end
 
     private
 
-    def process_map(map)
-      xml = get_xml_from_map(@map)
-      if is_siteindex?(xml)
-        process_siteindex(xml)
-      else
-        process_sitemap(xml)
-      end
+    def process_uri(uri)
+      uri.xml.nil? ? nil : process_xml(uri.xml)
     end
 
-    def get_xml_from_map(map)
-      case map.io.content_type
-      when 'application/octet-stream'
-        Nokogiri::XML(Zlib::GzipReader.new(map.io))
-      when 'application/xml'
-        Nokogiri::XML(map.io)
-      else
-        nil
-      end
-    end
-
-    def is_siteindex?(xml)
-      xml.xpath('//xmlns:sitemap').size > 0
+    def process_xml(xml)
+      is_siteindex?(xml) ? process_siteindex(xml) : get_locs(xml)
     end
 
     def process_siteindex(xml)
       @urls = []
-      maps = get_locs(xml)
-      maps.each do |map|
-        xml = get_xml_from_map(Uri.new(map))
-        @urls += process_sitemap(xml)
+      get_locs(xml).each do |loc|
+        uri = Uri.new(loc)
+        locs = process_uri(uri)
+        if !locs.nil?
+          @urls += get_locs(uri.xml)
+        end
       end
       return @urls
     end
 
-    def process_sitemap(xml)
-      return get_locs(xml)
+    def is_siteindex?(xml)
+      xml.xpath('//xmlns:sitemap').size > 0
     end
 
     def get_locs(xml)
