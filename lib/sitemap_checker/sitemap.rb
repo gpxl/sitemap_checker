@@ -3,7 +3,7 @@ module SitemapChecker
     attr_accessor :locs, :uri
 
     def initialize(uri)
-      @uri = Uri.new(uri)
+      @uri = SitemapChecker::Uri.new(uri)
       @locs = get_locs(@uri)
     end
 
@@ -23,7 +23,7 @@ module SitemapChecker
     def process_siteindex(xml)
       @urls = []
       get_uris(xml).each do |loc|
-        uri = Uri.new(loc)
+        uri = SitemapChecker::Uri.new(loc)
         locs = get_locs(uri)
         if !locs.nil?
           @urls += get_uris(uri.xml)
